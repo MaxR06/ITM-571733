@@ -1,0 +1,15 @@
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\bin\Debug\net10.0\EasyDevOps571733.exe
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\bin\Debug\net10.0\EasyDevOps571733.deps.json
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\bin\Debug\net10.0\EasyDevOps571733.runtimeconfig.json
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\bin\Debug\net10.0\EasyDevOps571733.dll
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\bin\Debug\net10.0\EasyDevOps571733.pdb
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.AssemblyInfoInputs.cache
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.AssemblyInfo.cs
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.csproj.CoreCompileInputs.cache
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.sourcelink.json
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.dll
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\refint\EasyDevOps571733.dll
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.pdb
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\EasyDevOps571733.genruntimeconfig.cache
+C:\Users\maxre\ITM546651\frontend\EasyDevOps571733\obj\Debug\net10.0\ref\EasyDevOps571733.dll
