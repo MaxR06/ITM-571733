@@ -21,7 +21,7 @@ pipeline {
 
     stage('Security Test (Snyk)') {
       steps {
-        withCredentials([string(credentialsId: 'snyk-token', variable: 'b886b83b-25d9-4037-ad6e-0d1348497298')]) {
+        withCredentials([string(credentialsId: 'snyk-token', variable: 'snyk-token')]) {
           // Scan de frontend-root; Snyk zoekt zelf alle projecten (--all-projects)
           dir('frontend') {
             bat 'set "SNYK_TOKEN=%SNYK_TOKEN%" && "C:\\tools\\snyk\\snyk.exe" test --all-projects --org=maxr06'
