@@ -1,21 +1,18 @@
+
+// --- BEGIN: Jenkinsfile ---
 pipeline {
   agent any
   options { timestamps(); ansiColor('xterm') }
-  triggers { githubPush() }   // jouw webhook blijft werken
+  triggers { githubPush() }
 
   environment {
     DOTNET = 'C:\\Program Files\\dotnet\\dotnet.exe'
     CONFIGURATION = 'Release'
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-    // voor de zekerheid dotnet in PATH tijdens de build
     PATH = "${env.PATH};C:\\Program Files\\dotnet"
   }
 
   stages {
-
-    // Declarative doet zelf "Checkout SCM" vóór de stages.
-    // Wil je expliciet je eigen Checkout-stage? Kan, maar niet nodig.
-
     stage('Verify tooling') {
       steps {
         bat 'where dotnet || echo dotnet not found on PATH'
@@ -27,9 +24,9 @@ pipeline {
       steps {
         bat '''
           setlocal enabledelayedexpansion
-
-          rem --- Zoek het project (.csproj): eerst onder .\\frontend\\, anders in hele repo
+          rem 1) Eerst onder .\\frontend\\ kijken
           for /f "delims=" %%F in ('dir /s /b frontend\\*.csproj 2^>nul') do set PROJ=%%F
+          rem 2) Anders overal in de repo
           if not defined PROJ for /f "delims=" %%F in ('dir /s /b *.csproj') do set PROJ=%%F
 
           if not defined PROJ (
@@ -38,8 +35,6 @@ pipeline {
           )
 
           echo GEVONDEN PROJECT: !PROJ!
-
-          rem --- Build pipeline voor .NET (restore -> build -> publish)
           "%DOTNET%" restore "!PROJ!"
           "%DOTNET%" build   "!PROJ!" -c %CONFIGURATION% --no-restore
           "%DOTNET%" publish "!PROJ!" -c %CONFIGURATION% -o publish --no-build
@@ -50,7 +45,7 @@ pipeline {
     stage('Test') {
       steps {
         echo 'Geen testproject(en) geconfigureerd — stap overgeslagen.'
-        // Later kun je hier dotnet test opnemen:
+        // Voorbeeld:
         // bat '"%DOTNET%" test tests\\Frontend.Tests\\Frontend.Tests.csproj -c %CONFIGURATION% --no-build'
       }
     }
@@ -59,8 +54,6 @@ pipeline {
       steps {
         bat '''
           setlocal enabledelayedexpansion
-
-          rem --- Gebruik hetzelfde project als in Build
           for /f "delims=" %%F in ('dir /s /b frontend\\*.csproj 2^>nul') do set PROJ=%%F
           if not defined PROJ for /f "delims=" %%F in ('dir /s /b *.csproj') do set PROJ=%%F
 
@@ -73,7 +66,6 @@ pipeline {
           "%DOTNET%" list "!PROJ!" package --vulnerable --include-transitive > nuget-audit.txt
           type nuget-audit.txt
 
-          rem --- Rood maken als er kwetsbaarheden zijn
           powershell -NoProfile -Command ^
             "$hasVuln = Select-String -Path nuget-audit.txt -Pattern 'has the following vulnerable packages' -Quiet; ^
              if ($hasVuln) { Write-Host 'Vulnerabilities found -> failing build'; exit 1 } ^
@@ -96,4 +88,5 @@ pipeline {
     always  { cleanWs() }
   }
 }
+// --- END: Jenkinsfile ---
 ``
