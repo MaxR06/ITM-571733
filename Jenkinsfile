@@ -12,7 +12,7 @@ pipeline {
 
     stage('Build Frontend') {
       steps {
-        // Bouwt jouw csproj op het juiste pad
+        // Bouwt jouw csproj op het juiste pad te zeten
         dir('frontend/EasyDevOps571733') {
           bat 'dotnet --version'
           bat 'dotnet restore "EasyDevOps571733.csproj"'
