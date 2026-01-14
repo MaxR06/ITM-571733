@@ -20,7 +20,7 @@ pipeline {
 
     stage('Security Test (Snyk)') {
       steps {
-        withCredentials([string(credentialsId: 'snyk-token', variable: 'SNYK_TOKEN')]) {
+        withCredentials([string(credentialsId: 'snyk-token', variable: 'snyk-token')]) {
           dir('frontend') {
             bat 'set "SNYK_TOKEN=%SNYK_TOKEN%" && "C:\\tools\\snyk\\snyk.exe" test --all-projects --org=maxr06'
           }
