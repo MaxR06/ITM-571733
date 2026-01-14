@@ -1,27 +1,21 @@
-
 pipeline {
   agent any
-  options { timestamps() }
-  // Laat staan als je een GitHub webhook gebruikt
-  triggers { githubPush() }
+  options { timestamps(); ansiColor('xterm') }
+  triggers { githubPush() }   // jouw webhook blijft werken
 
   environment {
     DOTNET = 'C:\\Program Files\\dotnet\\dotnet.exe'
     CONFIGURATION = 'Release'
     DOTNET_CLI_TELEMETRY_OPTOUT = '1'
-    // Voor de zekerheid dotnet in PATH tijdens de build
+    // voor de zekerheid dotnet in PATH tijdens de build
     PATH = "${env.PATH};C:\\Program Files\\dotnet"
   }
 
   stages {
-    stage('Checkout') {
-      steps {
-        // Pas eventueel je repo/branch aan
-        git branch: 'main', url: 'https://github.com/MaxR06/ITM-571733.git'
-      }
-    }
 
-    // Handige korte check; kun je later weghalen
+    // Declarative doet zelf "Checkout SCM" vóór de stages.
+    // Wil je expliciet je eigen Checkout-stage? Kan, maar niet nodig.
+
     stage('Verify tooling') {
       steps {
         bat 'where dotnet || echo dotnet not found on PATH'
@@ -34,18 +28,18 @@ pipeline {
         bat '''
           setlocal enabledelayedexpansion
 
-          rem 1) Probeer eerst onder .\\frontend\\ naar een .csproj
+          rem --- Zoek het project (.csproj): eerst onder .\\frontend\\, anders in hele repo
           for /f "delims=" %%F in ('dir /s /b frontend\\*.csproj 2^>nul') do set PROJ=%%F
-
-          rem 2) Anders ergens in de repo
           if not defined PROJ for /f "delims=" %%F in ('dir /s /b *.csproj') do set PROJ=%%F
 
           if not defined PROJ (
-            echo ERROR: Geen .csproj gevonden
+            echo ERROR: Geen .csproj gevonden in workspace
             exit /b 1
           )
 
           echo GEVONDEN PROJECT: !PROJ!
+
+          rem --- Build pipeline voor .NET (restore -> build -> publish)
           "%DOTNET%" restore "!PROJ!"
           "%DOTNET%" build   "!PROJ!" -c %CONFIGURATION% --no-restore
           "%DOTNET%" publish "!PROJ!" -c %CONFIGURATION% -o publish --no-build
@@ -56,7 +50,7 @@ pipeline {
     stage('Test') {
       steps {
         echo 'Geen testproject(en) geconfigureerd — stap overgeslagen.'
-        // Voorbeeld als je later tests toevoegt:
+        // Later kun je hier dotnet test opnemen:
         // bat '"%DOTNET%" test tests\\Frontend.Tests\\Frontend.Tests.csproj -c %CONFIGURATION% --no-build'
       }
     }
@@ -66,12 +60,12 @@ pipeline {
         bat '''
           setlocal enabledelayedexpansion
 
-          rem Zelfde project-detectie als in Build
+          rem --- Gebruik hetzelfde project als in Build
           for /f "delims=" %%F in ('dir /s /b frontend\\*.csproj 2^>nul') do set PROJ=%%F
           if not defined PROJ for /f "delims=" %%F in ('dir /s /b *.csproj') do set PROJ=%%F
 
           if not defined PROJ (
-            echo ERROR: Geen .csproj gevonden
+            echo ERROR: Geen .csproj gevonden voor audit
             exit /b 1
           )
 
@@ -79,7 +73,7 @@ pipeline {
           "%DOTNET%" list "!PROJ!" package --vulnerable --include-transitive > nuget-audit.txt
           type nuget-audit.txt
 
-          rem Faal build als kwetsbaarheden gevonden zijn
+          rem --- Rood maken als er kwetsbaarheden zijn
           powershell -NoProfile -Command ^
             "$hasVuln = Select-String -Path nuget-audit.txt -Pattern 'has the following vulnerable packages' -Quiet; ^
              if ($hasVuln) { Write-Host 'Vulnerabilities found -> failing build'; exit 1 } ^
@@ -91,7 +85,7 @@ pipeline {
     stage('Archive') {
       steps {
         writeFile file: 'build-info.txt', text: "Build time: ${new Date()}"
-        archiveArtifacts artifacts: 'build-info.txt, publish/**/*', fingerprint: true
+        archiveArtifacts artifacts: 'build-info.txt, nuget-audit.txt, publish/**/*', fingerprint: true
       }
     }
   }
@@ -102,3 +96,4 @@ pipeline {
     always  { cleanWs() }
   }
 }
+``
